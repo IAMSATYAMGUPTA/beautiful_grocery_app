@@ -1,11 +1,14 @@
+import 'package:beautiful_grocery_app/Cart%20Item/Cart_item.dart';
 import 'package:beautiful_grocery_app/HomeScrenn/Screen2.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/Screen3.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/Cart_item.dart';
+import 'package:beautiful_grocery_app/Provider_Services/cart_provider.dart';
+import 'like_items.dart';
 import 'package:beautiful_grocery_app/HomeScrenn/user_account.dart';
 import 'package:beautiful_grocery_app/HomeScrenn/home_dart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ManageBottonNav extends StatefulWidget{
   @override
@@ -14,7 +17,17 @@ class ManageBottonNav extends StatefulWidget{
 
 class _ManageBottonNavState extends State<ManageBottonNav> {
   int _selectedItem = 2;
-  var _pagesData = [Screen2(),Screen3(),HomeScreenPage(),CartItemPage(),Screen5()];
+  var _pagesData = [Screen2(),LikeItemsPage(),HomeScreenPage(),CartItemPage(),Screen5()];
+
+  @override
+  void initState() {
+    super.initState();
+    getCounter();
+  }
+
+  void getCounter(){
+    Provider.of<CartProvider>(context,listen: false).fetchCartData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +54,8 @@ class _ManageBottonNavState extends State<ManageBottonNav> {
 
 
             //-----------------------------Order--------------------------------
-            _selectedItem.toString().contains("1") ? CustomIcon(icon: Icons.history)
-                :Icon(Icons.work_history_outlined,size: 30,color: Colors.white),
+            _selectedItem.toString().contains("1") ? CustomIcon(icon: Icons.favorite_border)
+                :Icon(Icons.favorite_border,size: 30,color: Colors.white),
 
 
             //-----------------------------Home--------------------------------
@@ -52,7 +65,15 @@ class _ManageBottonNavState extends State<ManageBottonNav> {
 
             //----------------------------CartItem-------------------------------
             _selectedItem.toString().contains("3") ? CustomIcon(icon: Icons.add_shopping_cart_outlined)
-                :Icon(Icons.add_shopping_cart_outlined,size: 30,color: Colors.white),
+                :badges.Badge(
+              badgeContent: Consumer<CartProvider>(
+                builder: (context, value, child) {
+                  return Text(value.counter.toString(),style: TextStyle(color: Colors.white),);
+                },
+              ),
+              child: Icon(Icons.add_shopping_cart_outlined,size: 30,color: Colors.white),
+              badgeAnimation: badges.BadgeAnimation.rotation(animationDuration: Duration(milliseconds: 300)),
+            ),
 
 
             //----------------------------Account--------------------------------

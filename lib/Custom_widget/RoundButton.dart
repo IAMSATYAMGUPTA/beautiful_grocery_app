@@ -6,9 +6,10 @@ class RoundButton extends StatelessWidget{
   final VoidCallback onTab;
   var width;
   var height;
+  Color color;
 
 
-  RoundButton({required this.title,required this.onTab,this.width=65.0,this.height=24.0}){
+  RoundButton({required this.title,required this.onTab,this.width=65.0,this.height=24.0,this.color=Colors.white}){
 
   }
 
@@ -23,7 +24,7 @@ class RoundButton extends StatelessWidget{
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(9),
             border: Border.all(color: Colors.lightGreen.shade300,width: 2),
-            color: Colors.white
+            color: color
           )
       ),
     );

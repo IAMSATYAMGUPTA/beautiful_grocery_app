@@ -5,10 +5,11 @@ class GradientButton extends StatelessWidget{
   final String title;
   final VoidCallback onTab;
   var width;
+  var height;
   bool loading;
 
 
-  GradientButton({required this.title,required this.onTab,this.width=150.0,this.loading = false}){
+  GradientButton({required this.title,required this.onTab,this.width=150.0,this.height=50.0,this.loading = false}){
 
   }
 
@@ -18,7 +19,7 @@ class GradientButton extends StatelessWidget{
       onTap: onTab,
       child: Container(
           width: width,
-          height: 50,
+          height: height,
           child: Center(child: loading ? CircularProgressIndicator(color: Colors.white,strokeWidth: 3,) :
           Text(title,style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),
           decoration: BoxDecoration(

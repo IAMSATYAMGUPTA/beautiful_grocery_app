@@ -46,12 +46,20 @@ dependencies:
   firebase_database: ^10.2.3
   curved_navigation_bar: ^1.0.3
   rive: ^0.11.4
-
+  image_picker: ^1.0.1
   # text variation
   animated_text_kit: ^4.2.2
 
   # Icon Purpose
   font_awesome_flutter: ^10.1.0
+
+  # text function like see more
+  expandable_text: 2.3.0
+
+  provider: ^6.0.5
+
+  shared_preferences: ^2.2.0
+  badges: ^3.1.1
 
 
 dev_dependencies:
@@ -82,6 +90,7 @@ flutter:
      - assets/images/verifications_image/
      - assets/images/homeimg/
      - assets/rive/
+     - assets/images/itemdisplay/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

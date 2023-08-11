@@ -5,6 +5,7 @@ import 'package:beautiful_grocery_app/Custom_widget/textfeild_decoration.dart';
 import 'package:beautiful_grocery_app/Custom_widget/validator_mixin.dart';
 import 'package:beautiful_grocery_app/HomeScrenn/home_dart.dart';
 import 'package:beautiful_grocery_app/HomeScrenn/manage_bottom_navigation.dart';
+import 'package:beautiful_grocery_app/user_details/add_user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -66,18 +67,6 @@ class _SignupScreenPageState extends State<SignupScreenPage> with ValidatorMixin
                           ],
                         ),
                         SizedBox(height: 30,),
-
-                        // user Original name Text Feild
-                        TextFormField(
-                          style: TextStyle(fontSize: 16),
-                          controller: usernameController,
-                          decoration: TextFeildDecoration.getCustomDecoration(
-                            labelText: "Name",
-                            suffixcolor: Colors.green,
-
-                          ),
-                        ),
-                        SizedBox(height: 22,),
 
                         // username or email Text Feild
                         TextFormField(
@@ -143,15 +132,8 @@ class _SignupScreenPageState extends State<SignupScreenPage> with ValidatorMixin
                           });
                           formKey.currentState!.reset();
                           Navigator.pushReplacement(
-                              context, MaterialPageRoute(builder: (context) => ManageBottonNav()));
+                              context, MaterialPageRoute(builder: (context) => AddUserDetailPage()));
                           CustomToast().toastMessage(msg: "Account created succesfully");
-                          final FirebaseAuth auth = FirebaseAuth.instance;
-                          User? user = auth.currentUser;
-                          var uid = user!.uid;
-                          final databaseRef = FirebaseDatabase.instance.ref("Usernames");
-                          databaseRef.child(uid.toString()).set({
-                            'name' : usernameController.text.toString()
-                          }).onError((error, stackTrace) => CustomToast().toastMessage(msg: error.toString()));
 
                         }
                         ).onError((error, stackTrace) {
@@ -173,7 +155,7 @@ class _SignupScreenPageState extends State<SignupScreenPage> with ValidatorMixin
                 }),
               ],
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 30,),
 
             // back to Login Screen Text
             Row(

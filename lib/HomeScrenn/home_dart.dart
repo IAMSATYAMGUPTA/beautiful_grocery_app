@@ -1,12 +1,15 @@
 import 'package:beautiful_grocery_app/Custom_widget/RoundButton.dart';
 import 'package:beautiful_grocery_app/Custom_widget/custom_toast.dart';
+import 'package:beautiful_grocery_app/Provider_Services/cart_provider.dart';
 import 'package:beautiful_grocery_app/User%20_Entry_Verification/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'search_bar.dart';
 
 class HomeScreenPage extends StatefulWidget {
 
@@ -17,11 +20,13 @@ class HomeScreenPage extends StatefulWidget {
 class _HomeScreenPageState extends State<HomeScreenPage> {
 
   String? username;
+  String? imageUrl;
   var uid;
 
   final FirebaseAuth auth = FirebaseAuth.instance;
   final databaseReference = FirebaseDatabase.instance.ref();
-  final categoryRef = FirebaseDatabase.instance.ref("categories");
+  final categoryRef = FirebaseFirestore.instance.collection("categories").snapshots();
+  // final categoryRef = FirebaseDatabase.instance.ref("categories");
   final discountRef = FirebaseDatabase.instance.ref("discount");
   final dodRef = FirebaseDatabase.instance.ref("dealday");
   final mPopularRef = FirebaseDatabase.instance.ref("mostpopular");
@@ -39,8 +44,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   Future<void> fetchData() async {
-    DataSnapshot snapshot = await databaseReference.child("Usernames/$uid/name").get();
-    this.username = snapshot.value.toString();
+    final firestoreRef = FirebaseFirestore.instance.collection('Usernames');
+    DocumentSnapshot snapshot = await firestoreRef.doc(uid).get();
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+    this.username = data['name'];
+    this.imageUrl = data['profile'];
     setState(() {
 
     });
@@ -54,6 +62,8 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+
+            //-------------------Search bar and user photo--------------
             Container(
               color: Colors.green,
               child: Column(
@@ -64,7 +74,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       Padding(
                         padding: const EdgeInsets.only(left:29.0,right: 20.0),
                         child: CircleAvatar(
-                          child: Image.network("https://tricky-photoshop.com/wp-content/uploads/2017/08/final-1.png"),
+                          backgroundImage: NetworkImage(imageUrl==null ? "https://tricky-photoshop.com/wp-content/uploads/2017/08/final-1.png":imageUrl.toString()),
                         ),
                       ),
                       Column(
@@ -74,12 +84,16 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                           Text("${username}", style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),)
                         ],
                       ),
-                      const Expanded(child: Align(
+                      Expanded(child: Align(
                         alignment: Alignment.centerRight,
                         child: Card(
                           shape: CircleBorder(),
                           elevation: 3,
-                          child: CircleAvatar(backgroundColor: Colors.white,child: Icon(Icons.notification_add,color: Colors.black,)),
+                          child: InkWell(
+                            onTap: (){
+                              SignOut();
+                              },
+                              child: CircleAvatar(backgroundColor: Colors.white,child: Icon(Icons.notification_add,color: Colors.black,))),
                         ),
                       ),),
                       SizedBox(width: 29,),
@@ -92,19 +106,24 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: Container(
-                        height: 45,
-                        width: 310,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 12.0,right: 6),
-                              child: Icon(Icons.search,color: Colors.grey.shade400,size: 23,),
-                            ),
-                            Text("Search your daily Grocery Food",style: TextStyle(color: Colors.grey.shade400,fontSize: 15),),
-                          ],
-                        ),
+                      child: InkWell(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage(),));
+                        },
+                        child: Container(
+                          height: 45,
+                          width: 310,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 12.0,right: 6),
+                                child: Icon(Icons.search,color: Colors.grey.shade400,size: 23,),
+                              ),
+                              Text("Search your daily Grocery Food",style: TextStyle(color: Colors.grey.shade400,fontSize: 15),),
+                            ],
+                          ),
 
+                        ),
                       ),
                     ),
                   ),
@@ -113,6 +132,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
             ),
 
+            //-------------------Categories item-----------------------
             Container(
               margin: EdgeInsets.only(top: 10,left: 11,right: 11),
               child: Column(
@@ -138,36 +158,58 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               ],
                             ),
                             SizedBox(height: 4,),
-                            Expanded(
-                              child: FirebaseAnimatedList(
-                                  scrollDirection: Axis.horizontal,
-                                  query: categoryRef,
-                                  itemBuilder: (context, snapshot, animation, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: InkWell(
-                                        onTap: (){
-                                          Navigator.pushNamed(context, "/itempage",arguments: snapshot.child('name').value.toString());
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Container(height: 100,width: 85,
-                                              decoration: BoxDecoration(
-                                                color: _color[index],
-                                                borderRadius: BorderRadius.circular(12)
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(9.0),
-                                                child: Image.network(snapshot.child('image').value.toString()),
-                                              ),
+                            StreamBuilder<QuerySnapshot>(
+                              stream: categoryRef,
+                              builder: (context,AsyncSnapshot<QuerySnapshot> snapshot) {
+
+                                if(snapshot.connectionState == ConnectionState.waiting){
+                                  return Center(child: CircularProgressIndicator());
+                                }
+                                else if(snapshot.hasError){
+                                  return Text("........... Error..........");
+                                }
+                                else{
+                                  return Expanded(
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        final image = snapshot.data!.docs[index]['image'].toString();
+                                        final name = snapshot.data!.docs[index]['name'].toString();
+                                        final id = snapshot.data!.docs[index]['id'].toString();
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: InkWell(
+                                            onTap: (){
+                                              Navigator.pushNamed(context, "/itempage",arguments: {
+                                                'name' : name,
+                                                'id' : id,
+                                              });
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Container(height: 100,width: 85,
+                                                  decoration: BoxDecoration(
+                                                      color: _color[index],
+                                                      borderRadius: BorderRadius.circular(12)
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(9.0),
+                                                    child: Image.network(image),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 4,),
+                                                Text(name,style: TextStyle(fontWeight: FontWeight.w400),)
+                                              ],
                                             ),
-                                            SizedBox(height: 4,),
-                                            Text(snapshot.child('name').value.toString(),style: TextStyle(fontWeight: FontWeight.w400),)
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+
+                              },
                             )
                           ],
                         ),
@@ -177,6 +219,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
             ),
 
+            //--------------------Offer banners-------------------------
             Container(
               margin: EdgeInsets.only(left: 16,top: 10),
               height: 110,
@@ -220,6 +263,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
             ),
 
+            //------------------Deal of the day------------------------
             Container(
               margin: EdgeInsets.only(top: 10,left: 11,right: 11),
               child: Column(
@@ -281,6 +325,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
             ),
 
+            //-------------------Most popular--------------------------
             Container(
               margin: EdgeInsets.all(13),
               height: 470,width: 400,color: Colors.lightGreen.shade100,
@@ -397,49 +442,3 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
 }
 
-// Container(
-// height: 204,
-// width: 140,
-// decoration: BoxDecoration(
-// color: Colors.white,
-// borderRadius: BorderRadius.circular(6),
-// border: Border.all(color: Colors.green.shade500)
-// ),
-// child: Column(
-// children: [
-// Container(
-// height: 120,
-// child: Image.network("https://firebasestorage.googleapis.com/v0/b/flutter-dumy-38ec9.appspot.com/o/mostpopular%2Fei_1689666981190-removebg-preview.png?alt=media&token=952e95eb-dceb-481b-94c8-b0860f2d8393"),
-// ),
-// Container(
-// height: 80,
-// width: 140,
-// color: Colors.grey.shade100,
-// child: Padding(
-// padding: const EdgeInsets.all(8.0),
-// child: Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// mainAxisAlignment: MainAxisAlignment.spaceBetween,
-// children: [
-// Text("Anar 1 kg"),
-// Row(
-// crossAxisAlignment: CrossAxisAlignment.end,
-// mainAxisAlignment: MainAxisAlignment.spaceBetween,
-// children: [
-// Column(
-// children: [
-// Text("129"),
-// Text("1̶4̶9̶")
-// ],
-// ),
-// RoundButton(title: "Add", onTab: (){})
-//
-// ],
-// )
-// ],
-// ),
-// ),
-// )
-// ],
-// ),
-// )
