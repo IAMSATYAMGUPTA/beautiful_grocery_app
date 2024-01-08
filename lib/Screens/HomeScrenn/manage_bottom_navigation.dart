@@ -1,9 +1,11 @@
-import 'package:beautiful_grocery_app/Cart%20Item/Cart_item.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/Screen2.dart';
-import 'package:beautiful_grocery_app/Provider_Services/cart_provider.dart';
-import 'like_items.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/user_account.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/home_dart.dart';
+import 'package:beautiful_grocery_app/Screens/Cart%20Item/Cart_item.dart';
+import 'package:beautiful_grocery_app/Screens/Cart%20Item/cart_bloc/cart_bloc.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/Screen2.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/home_dart.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/user_account.dart';
+import 'package:beautiful_grocery_app/Screens/Like%20Item/Like%20Bloc/like_bloc.dart';
+import 'package:beautiful_grocery_app/Screens/Like%20Item/like_items.dart';
+import 'package:beautiful_grocery_app/Services/cart_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -23,10 +25,20 @@ class _ManageBottonNavState extends State<ManageBottonNav> {
   void initState() {
     super.initState();
     getCounter();
+    getCartList();
+    getLikeList();
   }
 
   void getCounter(){
     Provider.of<CartProvider>(context,listen: false).fetchCartData();
+  }
+
+  void getCartList(){
+    context.read<CartBloc>().GetCartItemListEvent();
+  }
+
+  void getLikeList(){
+    context.read<LikeBloc>().getLikeList();
   }
 
   @override

@@ -1,8 +1,6 @@
 import 'dart:async';
-
-import 'package:beautiful_grocery_app/HomeScrenn/home_dart.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/manage_bottom_navigation.dart';
-import 'package:beautiful_grocery_app/User%20_Entry_Verification/login_screen.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/manage_bottom_navigation.dart';
+import 'package:beautiful_grocery_app/Screens/User_onBoarding/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

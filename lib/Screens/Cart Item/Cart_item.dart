@@ -1,12 +1,14 @@
 import 'package:beautiful_grocery_app/Custom_widget/circle_icon_button.dart';
+import 'package:beautiful_grocery_app/Custom_widget/custom_toast.dart';
 import 'package:beautiful_grocery_app/Custom_widget/gradient_button.dart';
-import 'package:beautiful_grocery_app/Provider_Services/cart_provider.dart';
+import 'package:beautiful_grocery_app/Services/cart_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CartItemPage extends StatefulWidget{
   @override
@@ -17,6 +19,38 @@ class _CartItemPageState extends State<CartItemPage> {
 
   var cartItemRef = FirebaseFirestore.instance.collection('Usernames');
   User? user = FirebaseAuth.instance.currentUser;
+
+  var _razorpay = Razorpay();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+    CustomToast().toastMessage(msg: "Payment Succesful");
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+    CustomToast().toastMessage(msg: "Payment Failed",color: Colors.red.shade300);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet is selected
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +122,7 @@ class _CartItemPageState extends State<CartItemPage> {
                                                 SizedBox(height: 13,),
                                                 Row(
                                                   children: [
-                                                    Text(r"$"+"${snapshot.data!.docs[index]["productPrice"].toString()} ",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: Colors.black),),
+                                                    Text(r"$"+"${snapshot.data!.docs[index]["initialPrice"].toString()} ",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: Colors.black),),
                                                     Text(snapshot.data!.docs[index]['dozen'].toString(),style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500,fontSize: 15),)
                                                   ],
                                                 ),
@@ -154,14 +188,30 @@ class _CartItemPageState extends State<CartItemPage> {
                             ReusableWidget(title: 'Discount 10%',value: r"$"+"${(value.totalPrice*0.1).toStringAsFixed(2)}",isBold: false),
                             ReusableWidget(title: 'Total',value: r"$"+(value.totalPrice-(value.totalPrice*0.1)).toStringAsFixed(2),isBold: true),
                             SizedBox(height: 27,),
-                            Container(
-                                width: 300,
-                                height: 43,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Colors.green.shade500,
-                                ),
-                                child: Center(child: Text("Checkout",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),))
+                            InkWell(
+                              onTap: (){
+                                var options = {
+                                  'key': 'rzp_live_fExzrPbduwZelU',
+                                  'amount': (int.parse(((value.totalPrice-(value.totalPrice*0.1))* 100).toStringAsFixed(0))).toString(), //ye hme paise me diya hua hai 1000 mtlb 10 rupye
+                                  'name': 'Satyam Gupta',
+                                  'description': 'Home Grocery Store',
+                                  'timeout': 300, // in seconds
+                                  'prefill': {
+                                    'contact': '7891550362',
+                                    'email': 'satyamgupta6262@gmail.com'
+                                  }
+                                };
+                                _razorpay.open(options);
+                              },
+                              child: Container(
+                                  width: 300,
+                                  height: 43,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Colors.green.shade500,
+                                  ),
+                                  child: Center(child: Text("Checkout",style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),))
+                              ),
                             ),
                             SizedBox(height: 15,)
                           ],

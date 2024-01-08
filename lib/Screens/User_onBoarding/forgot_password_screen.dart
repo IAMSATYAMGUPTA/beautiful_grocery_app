@@ -3,7 +3,7 @@ import 'package:beautiful_grocery_app/Custom_widget/custom_toast.dart';
 import 'package:beautiful_grocery_app/Custom_widget/gradient_button.dart';
 import 'package:beautiful_grocery_app/Custom_widget/textfeild_decoration.dart';
 import 'package:beautiful_grocery_app/Custom_widget/validator_mixin.dart';
-import 'package:beautiful_grocery_app/User%20_Entry_Verification/login_screen.dart';
+import 'package:beautiful_grocery_app/Screens/User_onBoarding/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

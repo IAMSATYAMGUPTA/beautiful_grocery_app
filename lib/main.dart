@@ -1,18 +1,38 @@
-import 'package:beautiful_grocery_app/HomeScrenn/items_list_screen.dart';
-import 'package:beautiful_grocery_app/Provider_Services/cart_provider.dart';
-import 'package:beautiful_grocery_app/Splash_screen/splash_screen.dart';
+import 'package:beautiful_grocery_app/Screens/Cart%20Item/cart_bloc/cart_bloc.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/item_display.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/items_list_screen.dart';
+import 'package:beautiful_grocery_app/Screens/Like%20Item/Like%20Bloc/like_bloc.dart';
+import 'package:beautiful_grocery_app/Screens/Splash_screen/splash_screen.dart';
+import 'package:beautiful_grocery_app/Services/cart_provider.dart';
+import 'package:beautiful_grocery_app/Services/user_detail.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/item_display.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(ChangeNotifierProvider(
-      create: (context) => CartProvider(),
-      child: const MyApp(),
-  ));
+  runApp(MultiProvider(
+    providers: [
+      BlocProvider<UserDetailCubit>(
+        create: (context) => UserDetailCubit(),
+      ),
+
+      BlocProvider<CartBloc>(
+        create: (context) => CartBloc(),
+      ),
+
+      BlocProvider<LikeBloc>(
+        create: (context) => LikeBloc(),
+      ),
+
+      ChangeNotifierProvider(
+        create: (context) => CartProvider(),
+      ),
+    ],
+    child: const MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {

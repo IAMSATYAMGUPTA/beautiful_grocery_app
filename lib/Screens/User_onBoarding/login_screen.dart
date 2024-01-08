@@ -4,10 +4,9 @@ import 'package:beautiful_grocery_app/Custom_widget/custom_toast.dart';
 import 'package:beautiful_grocery_app/Custom_widget/gradient_button.dart';
 import 'package:beautiful_grocery_app/Custom_widget/textfeild_decoration.dart';
 import 'package:beautiful_grocery_app/Custom_widget/validator_mixin.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/home_dart.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/manage_bottom_navigation.dart';
-import 'package:beautiful_grocery_app/User%20_Entry_Verification/forgot_password_screen.dart';
-import 'package:beautiful_grocery_app/User%20_Entry_Verification/sign_up_screen.dart';
+import 'package:beautiful_grocery_app/Screens/HomeScrenn/manage_bottom_navigation.dart';
+import 'package:beautiful_grocery_app/Screens/User_onBoarding/forgot_password_screen.dart';
+import 'package:beautiful_grocery_app/Screens/User_onBoarding/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -43,6 +42,7 @@ class _LoginScreenPageState extends State<LoginScreenPage> with ValidatorMixin {
 
   var formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool isPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -100,10 +100,17 @@ class _LoginScreenPageState extends State<LoginScreenPage> with ValidatorMixin {
                           TextFormField(
                             validator: passValidate,
                             controller: passwordcController,
+                            obscuringCharacter: "*",
+                            obscureText: isPassword ? false:true,
                             decoration: TextFeildDecoration.getCustomDecoration(
                               labelText: "Password",
-                              mSuffixIcon: Icons.visibility_off,
+                              mSuffixIcon: isPassword ? Icons.visibility:Icons.visibility_off,
                               suffixcolor: Colors.green,
+                              onSuffixIconTap: (){
+                                setState(() {
+                                  isPassword=!isPassword;
+                                });
+                              }
                             ),
                           ),
                           SizedBox(height: 13,),

@@ -7,9 +7,10 @@ class GradientButton extends StatelessWidget{
   var width;
   var height;
   bool loading;
+  bool isColor;
 
 
-  GradientButton({required this.title,required this.onTab,this.width=150.0,this.height=50.0,this.loading = false}){
+  GradientButton({required this.title,required this.onTab,this.width=150.0,this.height=50.0,this.loading = false,this.isColor=false}){
 
   }
 
@@ -24,7 +25,7 @@ class GradientButton extends StatelessWidget{
           Text(title,style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.lime.shade500, Colors.green],
+              colors: [isColor? Colors.red.shade300:Colors.lime.shade500, isColor? Colors.red.shade300:Colors.green],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

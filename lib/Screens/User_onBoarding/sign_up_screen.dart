@@ -3,9 +3,7 @@ import 'package:beautiful_grocery_app/Custom_widget/custom_toast.dart';
 import 'package:beautiful_grocery_app/Custom_widget/gradient_button.dart';
 import 'package:beautiful_grocery_app/Custom_widget/textfeild_decoration.dart';
 import 'package:beautiful_grocery_app/Custom_widget/validator_mixin.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/home_dart.dart';
-import 'package:beautiful_grocery_app/HomeScrenn/manage_bottom_navigation.dart';
-import 'package:beautiful_grocery_app/user_details/add_user_detail.dart';
+import 'package:beautiful_grocery_app/Screens/user_details/add_user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,6 +27,7 @@ class _SignupScreenPageState extends State<SignupScreenPage> with ValidatorMixin
   var formKey = GlobalKey<FormState>();
 
   bool isLoading = false;
+  bool isPassword = false;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -87,10 +86,17 @@ class _SignupScreenPageState extends State<SignupScreenPage> with ValidatorMixin
                         TextFormField(
                           controller: passwordcController,
                           validator: passValidate,
+                          obscuringCharacter: "*",
+                          obscureText: isPassword ? false:true,
                           decoration: TextFeildDecoration.getCustomDecoration(
                             labelText: "Password",
-                            mSuffixIcon: Icons.visibility_off,
-                            suffixcolor: Colors.green,
+                              mSuffixIcon: isPassword ? Icons.visibility:Icons.visibility_off,
+                              suffixcolor: Colors.green,
+                              onSuffixIconTap: (){
+                                setState(() {
+                                  isPassword=!isPassword;
+                                });
+                              }
                           ),
                         ),
                         SizedBox(height: 22,),

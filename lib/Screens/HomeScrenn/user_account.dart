@@ -1,5 +1,4 @@
-
-import 'package:beautiful_grocery_app/user_details/user_profile.dart';
+import 'package:beautiful_grocery_app/Screens/user_details/user_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
