@@ -124,7 +124,7 @@ class _ItemPageScreenState extends State<ItemPageScreen> {
                               .toList();
 
                           return filteredBooks.isEmpty ? Center(
-                            child: Center(child: Text("No matching books found.")),
+                            child: Center(child: Text("No Items found.")),
                           ) :
                           BlocBuilder<CartBloc,CartState>(
                             builder: (context, state) {
@@ -133,7 +133,8 @@ class _ItemPageScreenState extends State<ItemPageScreen> {
                               }
                               else if(state is CartLoadedState){
                                 cartItemsList = state.cartItemList;
-                                String id = snapshot.data!.docs[0].id;
+                                // var id = DateTime.now().millisecondsSinceEpoch.toString();
+                                // String id = snapshot.data!.docs[0].id;
                                 return GridView.builder(
                                   padding: EdgeInsets.only(left: 6,right: 0,top: 2),
                                   shrinkWrap: true,
@@ -150,7 +151,7 @@ class _ItemPageScreenState extends State<ItemPageScreen> {
                                       // Prevent accessing an invalid index
                                       return SizedBox.shrink(); // Return an empty widget if index is out of bounds
                                     }
-
+                                    String id = filteredBooks[index]['id'].toString();
                                     String image = filteredBooks[index]['img'].toString();
                                     String name = filteredBooks[index]['name'].toString();
                                     String dozen = filteredBooks[index]['dozen'].toString();
